@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Redux Wordle</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/react@16.7.0/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@16.7.0/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  
+<style type="text/css">
+ 
+ h3 {
+    color:#883535;                
+}
+
+ body {                
+                text-align: center;
+                font-weight: bold;
+                color:#883535;                
+            }
+
+li {
+    color: black;
+    font-weight: 200;
+    text-align: left;
+}
+#myapp {
+    display: inline-grid;            
+    grid-template-columns: auto auto auto auto auto;
+    grid-gap: 10px;
+     }
+
+.wordle_board {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;   
+}
+
+.wordle_word {
+    display: flex;
+  gap: 15px; 
+  
+}
+
+.square {
+    border: 2px solid #000;
+    width: 30px;   
+    height: 30px;         
+    padding: 15px;              
+    text-align: center;                       
+    font-size: 2rem;  
+    margin:3px;    
+}
+
+.keyboard {
+  display: flex;
+  flex-direction: column;
+  gap: 5px; 
+  margin-top: 20px;
+}
+
+.k_row {
+  display: flex;
+  justify-content: center;
+  gap: 3px; 
+}
+
+
+.k_row_special {
+    display: flex;
+    justify-content: center;
+}
+
+.keyboard_button {
+  width: 35px;
+  height: 35px;
+  border: 1px solid #000; 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: lightgray; 
+  cursor: pointer;  
+}
+
+.k_row_special .keyboard_button {   
+    width: 80px;    
+    font-weight: bold;
+}
+
+.results p {
+    color: black;
+    font-weight: 300;
+    margin: 1px;
+  
+}
+
+  </style>
+</head>
+<body>
+
+<div id="myapp"></div>
+
+<script type="text/babel">
+
+
+function WordleBoard() {
+  /* function square(face, color='black')
+  this.face = face;
+  this.color = color;
+
+  squares = [ new Square('7'),
+new Square ('8')]
+*/ 
+    const givenAnswer = ['MIGHT', 'FLOOD', 'STRAY', '     ', '     ', '     '];
+  
+    return React.createElement('div', { className: 'wordle_board' },
+    givenAnswer.map((item, i) => {
+      return React.createElement('div', { key: i, className: 'wordle_word' },
+            
+        item.split('').map((letter, index) => {      
+        
+        return React.createElement('div', { key: i, className: `square tile-${index}`}, letter);
+       } )
+      );
+    })
+  );
+};
+
+
+function keyboard() {
+ 
+    const keyboardButtons = [
+    'qwertyuiop', 
+    'asdfghjkl', 
+    'zxcvbnm'
+    ];
+  
+ const specialButtons = [
+    'SUBMIT', 
+    'DELETE'
+    ];
+
+
+      const createKeyboardButton = (key) => {
+    return React.createElement('div', {className: 'keyboard_button'}, key);
+    };
+    
+        return React.createElement('div', {className: 'keyboard'},
+
+    
+    keyboardButtons.map((row, i) => {
+     return React.createElement('div', { key: i, className: 'k_row' },
+         row.split('').map((key, i) => createKeyboardButton(key))
+      );
+    }),
+    
+    
+    specialButtons.map((key, i) => {
+              return React.createElement('div', { key: i, className: 'k_row_special' },
+         createKeyboardButton(key)
+      );
+    })
+
+    
+  );
+};
+
+
+function result() {
+     const answer = "MOODY";  
+  const guesses = [
+    "MIGHT",
+    "FLOOD",
+    "STRAY"
+    ];
+  
+    const results = guesses.map(guess => {
+    let correctPosition = 0;
+    let correctWrongPos = 0;
+    let wrongLetter = 0;
+
+    let result =[];
+
+    const theGuesses = guess.split('');
+    const theAnswers = answer.split('');
+
+
+
+
+    
+    for (let i = 0; i < guess.length; i++) {
+      if (theGuesses[i] == theAnswers[i]) {
+        console.log(`theGuesses array:${theGuesses}`);
+        //console.log(theAnswers);
+        correctPosition++;
+          console.log(`count correct letter: ${correctPosition}`);
+        
+        console.log(`correct letter is: ${theGuesses[i]}`);
+        
+        theGuesses[i] = theAnswers[i] = null;
+      }
+    }
+
+    
+    for (let i = 0; i < guess.length; i++) {
+        let currentGuess = theGuesses[i];
+        if(currentGuess !== null){
+            console.log('current guesses:'+currentGuess);
+              let positionAnswer =-1;
+           
+              for(let a=0; a< theAnswers.length; a++){
+                     if(theAnswers[a] === currentGuess){
+                positionAnswer = a;
+                    console.log('the positon answer is:'+ positionAnswer);
+                    break;
+                }
+            }
+        
+        console.log(theGuesses);
+
+        if (positionAnswer !== -1) {
+          correctWrongPos++;
+         console.log("correctLetterwrong:"+correctWrongPos);
+          theAnswers[positionAnswer] = null;
+        } else {
+           // console.log(`wrong letter: ${wrongLetter}`);
+          wrongLetter++;
+              console.log(`wrong lettter: ${wrongLetter}`);
+        }
+      }
+    }
+
+    return {
+      guess,
+      correctPosition,
+      correctWrongPos,
+      wrongLetter
+    };
+  });
+
+  return React.createElement('div', { className: 'results' },
+    React.createElement('h1', null, '--- Your results --- '),
+        
+    results.map((result, index) => {
+     
+        return React.createElement('div', { key: index },
+        React.createElement('h3', null, `Your guess is: ${result.guess} vs MOODY`),        
+        React.createElement('li', null, `Number of letters in the correct position: ${result.correctPosition}`),
+        React.createElement('li', null, `Number of correct letters in the wrong position: ${result.correctWrongPos}`),
+        React.createElement('li', null, `Number of wrong letters: ${result.wrongLetter}`),
+        React.createElement('br')
+      );
+    })
+  );
+};
+
+var myList = React.createElement(
+    'div', { className: 'wordle_container' },
+    React.createElement(WordleBoard),
+    React.createElement(keyboard),
+    React.createElement(result)
+  );
+
+
+ReactDOM.render(myList, document.getElementById('myapp'));
+
+</script>
+</body>
+</html>
